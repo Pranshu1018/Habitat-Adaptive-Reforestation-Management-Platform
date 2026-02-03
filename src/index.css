@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Habitat - Eco-Tech Design System */
+
+@layer base {
+  :root {
+    /* Sage/Mint Background Palette */
+    --background: 140 20% 94%;
+    --foreground: 150 25% 15%;
+
+    /* Card with glassmorphism feel */
+    --card: 140 25% 97%;
+    --card-foreground: 150 25% 15%;
+
+    --popover: 140 25% 97%;
+    --popover-foreground: 150 25% 15%;
+
+    /* Natural forest green primary */
+    --primary: 150 52% 33%;
+    --primary-foreground: 140 20% 98%;
+
+    /* Soft sage secondary */
+    --secondary: 140 15% 90%;
+    --secondary-foreground: 150 25% 20%;
+
+    /* Muted earth tones */
+    --muted: 140 12% 88%;
+    --muted-foreground: 150 10% 45%;
+
+    /* Accent - slightly warmer green */
+    --accent: 145 40% 45%;
+    --accent-foreground: 140 20% 98%;
+
+    /* Alert colors */
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 15%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 142 71% 98%;
+
+    /* Borders and inputs */
+    --border: 140 18% 85%;
+    --input: 140 18% 85%;
+    --ring: 150 52% 33%;
+
+    --radius: 1rem;
+
+    /* Data visualization colors */
+    --chart-green: 150 52% 33%;
+    --chart-blue: 210 60% 50%;
+    --chart-amber: 38 92% 50%;
+    --chart-earth: 25 40% 45%;
+    --chart-sage: 140 30% 60%;
+
+    /* Glassmorphism */
+    --glass-bg: 140 25% 97% / 0.8;
+    --glass-border: 140 25% 90% / 0.5;
+
+    /* Sidebar */
+    --sidebar-background: 140 20% 96%;
+    --sidebar-foreground: 150 25% 20%;
+    --sidebar-primary: 150 52% 33%;
+    --sidebar-primary-foreground: 140 20% 98%;
+    --sidebar-accent: 140 20% 92%;
+    --sidebar-accent-foreground: 150 25% 20%;
+    --sidebar-border: 140 18% 88%;
+    --sidebar-ring: 150 52% 33%;
+  }
+
+  .dark {
+    --background: 150 20% 8%;
+    --foreground: 140 20% 95%;
+
+    --card: 150 20% 12%;
+    --card-foreground: 140 20% 95%;
+
+    --popover: 150 20% 12%;
+    --popover-foreground: 140 20% 95%;
+
+    --primary: 150 45% 50%;
+    --primary-foreground: 150 20% 8%;
+
+    --secondary: 150 15% 20%;
+    --secondary-foreground: 140 20% 90%;
+
+    --muted: 150 15% 18%;
+    --muted-foreground: 140 15% 60%;
+
+    --accent: 145 40% 40%;
+    --accent-foreground: 140 20% 98%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 85% 45%;
+    --warning-foreground: 38 92% 95%;
+
+    --success: 142 60% 40%;
+    --success-foreground: 142 71% 98%;
+
+    --border: 150 15% 22%;
+    --input: 150 15% 22%;
+    --ring: 150 45% 50%;
+
+    --glass-bg: 150 20% 12% / 0.85;
+    --glass-border: 150 15% 25% / 0.5;
+
+    --sidebar-background: 150 20% 10%;
+    --sidebar-foreground: 140 20% 90%;
+    --sidebar-primary: 150 45% 50%;
+    --sidebar-primary-foreground: 150 20% 8%;
+    --sidebar-accent: 150 15% 18%;
+    --sidebar-accent-foreground: 140 20% 90%;
+    --sidebar-border: 150 15% 20%;
+    --sidebar-ring: 150 45% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-white/20 shadow-xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+  }
+
+  .glow-button {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+
+  .glow-button::before {
+    content: '';
+    @apply absolute inset-0 bg-primary/20 blur-xl opacity-0 transition-opacity duration-300;
+  }
+
+  .glow-button:hover::before {
+    @apply opacity-100;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+}
