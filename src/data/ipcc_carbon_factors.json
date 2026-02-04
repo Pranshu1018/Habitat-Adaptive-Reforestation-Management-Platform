@@ -1,0 +1,138 @@
+{
+    "metadata": {
+        "source": "IPCC AFOLU Guidelines 2019 & FAO Biomass Expansion Factors",
+        "version": "hackathon-demo-v1",
+        "description": "Carbon sequestration factors for various forest types and species",
+        "units": {
+            "growth_rate": "tC/ha/year",
+            "carbon_per_ton": "tC/t biomass",
+            "maturity_years": "years"
+        }
+    },
+    "forest_types": {
+        "tropical_rainforest": {
+            "growth_rate": 12.5,
+            "carbon_per_ton": 0.47,
+            "maturity_years": 25,
+            "biomass_expansion_factor": 1.74,
+            "root_to_shoot_ratio": 0.24,
+            "description": "High-density tropical broadleaf forests"
+        },
+        "tropical_moist": {
+            "growth_rate": 10.8,
+            "carbon_per_ton": 0.47,
+            "maturity_years": 30,
+            "biomass_expansion_factor": 1.62,
+            "root_to_shoot_ratio": 0.27,
+            "description": "Tropical moist deciduous forests"
+        },
+        "temperate_broadleaf": {
+            "growth_rate": 6.2,
+            "carbon_per_ton": 0.48,
+            "maturity_years": 40,
+            "biomass_expansion_factor": 1.45,
+            "root_to_shoot_ratio": 0.29,
+            "description": "Temperate deciduous forests"
+        },
+        "temperate_conifer": {
+            "growth_rate": 7.8,
+            "carbon_per_ton": 0.51,
+            "maturity_years": 50,
+            "biomass_expansion_factor": 1.30,
+            "root_to_shoot_ratio": 0.32,
+            "description": "Temperate coniferous forests"
+        },
+        "savanna_woodland": {
+            "growth_rate": 4.5,
+            "carbon_per_ton": 0.45,
+            "maturity_years": 20,
+            "biomass_expansion_factor": 1.55,
+            "root_to_shoot_ratio": 0.35,
+            "description": "Savanna and woodland ecosystems"
+        },
+        "mangrove": {
+            "growth_rate": 15.2,
+            "carbon_per_ton": 0.46,
+            "maturity_years": 20,
+            "biomass_expansion_factor": 1.82,
+            "root_to_shoot_ratio": 0.45,
+            "description": "Coastal mangrove forests (highest carbon sequestration)"
+        }
+    },
+    "species_specific": {
+        "teak": {
+            "growth_rate": 8.5,
+            "carbon_per_ton": 0.49,
+            "maturity_years": 35,
+            "optimal_density": 400,
+            "description": "Tectona grandis - High-value timber"
+        },
+        "mahogany": {
+            "growth_rate": 7.2,
+            "carbon_per_ton": 0.48,
+            "maturity_years": 40,
+            "optimal_density": 350,
+            "description": "Swietenia macrophylla - Premium hardwood"
+        },
+        "acacia": {
+            "growth_rate": 11.5,
+            "carbon_per_ton": 0.46,
+            "maturity_years": 15,
+            "optimal_density": 600,
+            "description": "Acacia spp. - Fast-growing nitrogen fixer"
+        },
+        "eucalyptus": {
+            "growth_rate": 14.0,
+            "carbon_per_ton": 0.50,
+            "maturity_years": 12,
+            "optimal_density": 800,
+            "description": "Eucalyptus spp. - Rapid growth"
+        },
+        "bamboo": {
+            "growth_rate": 18.5,
+            "carbon_per_ton": 0.44,
+            "maturity_years": 5,
+            "optimal_density": 1200,
+            "description": "Bambusa spp. - Fastest carbon sequestration"
+        }
+    },
+    "age_based_factors": {
+        "0-5_years": {
+            "carbon_multiplier": 0.35,
+            "description": "Establishment phase - low carbon storage"
+        },
+        "5-10_years": {
+            "carbon_multiplier": 0.65,
+            "description": "Rapid growth phase"
+        },
+        "10-20_years": {
+            "carbon_multiplier": 1.0,
+            "description": "Peak growth phase"
+        },
+        "20-40_years": {
+            "carbon_multiplier": 0.85,
+            "description": "Maturity phase - slowing growth"
+        },
+        "40+_years": {
+            "carbon_multiplier": 0.50,
+            "description": "Old growth - maintenance phase"
+        }
+    },
+    "soil_carbon_factors": {
+        "tropical": {
+            "annual_accumulation": 0.8,
+            "saturation_level": 120,
+            "description": "tC/ha/year in soil organic carbon"
+        },
+        "temperate": {
+            "annual_accumulation": 0.5,
+            "saturation_level": 80,
+            "description": "tC/ha/year in soil organic carbon"
+        },
+        "arid": {
+            "annual_accumulation": 0.2,
+            "saturation_level": 40,
+            "description": "tC/ha/year in soil organic carbon"
+        }
+    }
+}

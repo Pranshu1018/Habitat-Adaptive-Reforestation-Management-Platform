@@ -1,0 +1,236 @@
+{
+    "metadata": {
+        "source": "ISRIC SoilGrids 2.0 - Global Soil Information",
+        "version": "hackathon-demo-v1",
+        "description": "Soil health indicators and normalization ranges by region",
+        "units": {
+            "soc": "g/kg (soil organic carbon)",
+            "quality_index": "0-100 normalized score",
+            "ph": "pH units",
+            "bulk_density": "kg/dm³"
+        }
+    },
+    "regional_baselines": {
+        "tropical_humid": {
+            "soc_baseline": 65,
+            "soc_range": [
+                40,
+                90
+            ],
+            "quality_range": [
+                50,
+                95
+            ],
+            "optimal_ph": 6.0,
+            "ph_range": [
+                5.0,
+                7.0
+            ],
+            "bulk_density": 1.2,
+            "description": "High rainfall tropical regions with rich organic matter"
+        },
+        "tropical_dry": {
+            "soc_baseline": 45,
+            "soc_range": [
+                25,
+                70
+            ],
+            "quality_range": [
+                35,
+                80
+            ],
+            "optimal_ph": 6.5,
+            "ph_range": [
+                5.5,
+                7.5
+            ],
+            "bulk_density": 1.4,
+            "description": "Seasonal tropical regions with moderate organic matter"
+        },
+        "temperate": {
+            "soc_baseline": 55,
+            "soc_range": [
+                35,
+                85
+            ],
+            "quality_range": [
+                45,
+                90
+            ],
+            "optimal_ph": 6.5,
+            "ph_range": [
+                5.5,
+                7.5
+            ],
+            "bulk_density": 1.3,
+            "description": "Temperate regions with seasonal variation"
+        },
+        "mediterranean": {
+            "soc_baseline": 40,
+            "soc_range": [
+                20,
+                65
+            ],
+            "quality_range": [
+                30,
+                75
+            ],
+            "optimal_ph": 7.0,
+            "ph_range": [
+                6.0,
+                8.0
+            ],
+            "bulk_density": 1.5,
+            "description": "Mediterranean climate with summer drought"
+        },
+        "arid": {
+            "soc_baseline": 25,
+            "soc_range": [
+                10,
+                45
+            ],
+            "quality_range": [
+                20,
+                60
+            ],
+            "optimal_ph": 7.5,
+            "ph_range": [
+                6.5,
+                8.5
+            ],
+            "bulk_density": 1.6,
+            "description": "Arid and semi-arid regions with low organic matter"
+        },
+        "boreal": {
+            "soc_baseline": 70,
+            "soc_range": [
+                50,
+                100
+            ],
+            "quality_range": [
+                55,
+                95
+            ],
+            "optimal_ph": 5.5,
+            "ph_range": [
+                4.5,
+                6.5
+            ],
+            "bulk_density": 1.1,
+            "description": "Cold regions with slow decomposition, high organic accumulation"
+        }
+    },
+    "soil_quality_indicators": {
+        "organic_carbon": {
+            "weight": 0.35,
+            "description": "Primary indicator of soil health and fertility",
+            "thresholds": {
+                "very_low": [
+                    0,
+                    15
+                ],
+                "low": [
+                    15,
+                    30
+                ],
+                "medium": [
+                    30,
+                    50
+                ],
+                "high": [
+                    50,
+                    75
+                ],
+                "very_high": [
+                    75,
+                    100
+                ]
+            }
+        },
+        "ph_balance": {
+            "weight": 0.20,
+            "description": "Soil acidity/alkalinity affecting nutrient availability",
+            "optimal_range": [
+                6.0,
+                7.0
+            ],
+            "penalty_per_unit": 10
+        },
+        "nutrient_content": {
+            "weight": 0.25,
+            "description": "Nitrogen, phosphorus, potassium availability",
+            "components": {
+                "nitrogen": 0.4,
+                "phosphorus": 0.3,
+                "potassium": 0.3
+            }
+        },
+        "water_retention": {
+            "weight": 0.20,
+            "description": "Soil moisture holding capacity",
+            "optimal_range": [
+                60,
+                80
+            ]
+        }
+    },
+    "restoration_impact": {
+        "year_1": {
+            "soc_increase": 2,
+            "quality_improvement": 5,
+            "description": "Initial establishment phase"
+        },
+        "year_2-5": {
+            "soc_increase": 5,
+            "quality_improvement": 8,
+            "description": "Active improvement phase"
+        },
+        "year_5-10": {
+            "soc_increase": 8,
+            "quality_improvement": 12,
+            "description": "Rapid recovery phase"
+        },
+        "year_10-20": {
+            "soc_increase": 6,
+            "quality_improvement": 10,
+            "description": "Stabilization phase"
+        },
+        "year_20+": {
+            "soc_increase": 3,
+            "quality_improvement": 5,
+            "description": "Mature ecosystem maintenance"
+        }
+    },
+    "texture_adjustments": {
+        "clay": {
+            "soc_capacity_multiplier": 1.3,
+            "water_retention": 85,
+            "description": "High nutrient and water retention"
+        },
+        "loam": {
+            "soc_capacity_multiplier": 1.0,
+            "water_retention": 70,
+            "description": "Optimal balance for most species"
+        },
+        "sandy": {
+            "soc_capacity_multiplier": 0.6,
+            "water_retention": 40,
+            "description": "Low retention, requires amendments"
+        },
+        "silt": {
+            "soc_capacity_multiplier": 0.9,
+            "water_retention": 65,
+            "description": "Good fertility, moderate retention"
+        }
+    },
+    "normalization_formula": {
+        "description": "Convert raw soil metrics to 0-100 health index",
+        "formula": "health = (soc_score * 0.35) + (ph_score * 0.20) + (nutrient_score * 0.25) + (moisture_score * 0.20)",
+        "components": {
+            "soc_score": "(actual_soc - min_soc) / (max_soc - min_soc) * 100",
+            "ph_score": "100 - abs(actual_ph - optimal_ph) * penalty_per_unit",
+            "nutrient_score": "weighted average of N, P, K levels",
+            "moisture_score": "actual_moisture / optimal_moisture * 100"
+        }
+    }
+}

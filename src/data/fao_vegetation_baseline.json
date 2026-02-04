@@ -1,0 +1,181 @@
+{
+    "metadata": {
+        "source": "FAO Global Forest Resources Assessment 2020",
+        "version": "hackathon-demo-v1",
+        "description": "Vegetation density baselines and recovery rates by biome",
+        "units": {
+            "baseline": "vegetation density index (0-100)",
+            "recovery_rate": "% increase per year",
+            "canopy_cover": "% ground coverage"
+        }
+    },
+    "biomes": {
+        "tropical_rainforest": {
+            "baseline": 85,
+            "recovery_rate": 2.5,
+            "canopy_cover_target": 90,
+            "ndvi_baseline": 0.78,
+            "description": "Dense tropical broadleaf forests",
+            "typical_regions": [
+                "Amazon",
+                "Congo Basin",
+                "Southeast Asia"
+            ]
+        },
+        "tropical_moist_forest": {
+            "baseline": 75,
+            "recovery_rate": 2.2,
+            "canopy_cover_target": 80,
+            "ndvi_baseline": 0.72,
+            "description": "Tropical moist deciduous forests",
+            "typical_regions": [
+                "Western Ghats",
+                "Central America"
+            ]
+        },
+        "temperate_forest": {
+            "baseline": 70,
+            "recovery_rate": 1.8,
+            "canopy_cover_target": 75,
+            "ndvi_baseline": 0.68,
+            "description": "Temperate broadleaf and mixed forests",
+            "typical_regions": [
+                "Eastern US",
+                "Europe",
+                "East Asia"
+            ]
+        },
+        "boreal_forest": {
+            "baseline": 65,
+            "recovery_rate": 1.2,
+            "canopy_cover_target": 70,
+            "ndvi_baseline": 0.62,
+            "description": "Northern coniferous forests",
+            "typical_regions": [
+                "Canada",
+                "Scandinavia",
+                "Siberia"
+            ]
+        },
+        "savanna": {
+            "baseline": 45,
+            "recovery_rate": 3.2,
+            "canopy_cover_target": 50,
+            "ndvi_baseline": 0.48,
+            "description": "Tropical and subtropical grasslands with scattered trees",
+            "typical_regions": [
+                "African Savanna",
+                "Cerrado"
+            ]
+        },
+        "woodland": {
+            "baseline": 55,
+            "recovery_rate": 2.8,
+            "canopy_cover_target": 60,
+            "ndvi_baseline": 0.55,
+            "description": "Open forests and woodlands",
+            "typical_regions": [
+                "Mediterranean",
+                "Australian Woodland"
+            ]
+        },
+        "mangrove": {
+            "baseline": 80,
+            "recovery_rate": 3.5,
+            "canopy_cover_target": 85,
+            "ndvi_baseline": 0.75,
+            "description": "Coastal mangrove ecosystems",
+            "typical_regions": [
+                "Sundarbans",
+                "Everglades"
+            ]
+        },
+        "dry_forest": {
+            "baseline": 50,
+            "recovery_rate": 2.0,
+            "canopy_cover_target": 55,
+            "ndvi_baseline": 0.52,
+            "description": "Tropical dry forests",
+            "typical_regions": [
+                "Chaco",
+                "Miombo"
+            ]
+        }
+    },
+    "recovery_stages": {
+        "degraded": {
+            "density_range": [
+                0,
+                30
+            ],
+            "recovery_time_years": 15,
+            "description": "Severely degraded land requiring intensive restoration"
+        },
+        "early_succession": {
+            "density_range": [
+                30,
+                50
+            ],
+            "recovery_time_years": 10,
+            "description": "Early vegetation establishment"
+        },
+        "mid_succession": {
+            "density_range": [
+                50,
+                70
+            ],
+            "recovery_time_years": 8,
+            "description": "Developing forest structure"
+        },
+        "late_succession": {
+            "density_range": [
+                70,
+                85
+            ],
+            "recovery_time_years": 5,
+            "description": "Maturing forest approaching baseline"
+        },
+        "mature": {
+            "density_range": [
+                85,
+                100
+            ],
+            "recovery_time_years": 0,
+            "description": "Fully recovered or pristine forest"
+        }
+    },
+    "normalization_factors": {
+        "ndvi_to_density": {
+            "formula": "density = (NDVI - 0.1) / 0.8 * 100",
+            "min_ndvi": 0.1,
+            "max_ndvi": 0.9,
+            "description": "Convert NDVI satellite data to vegetation density index"
+        },
+        "canopy_to_density": {
+            "formula": "density = canopy_cover * 0.95",
+            "description": "Convert canopy cover percentage to density index"
+        }
+    },
+    "seasonal_adjustments": {
+        "tropical_wet": {
+            "dry_season_reduction": 5,
+            "wet_season_boost": 8,
+            "description": "Minimal seasonal variation"
+        },
+        "tropical_dry": {
+            "dry_season_reduction": 25,
+            "wet_season_boost": 15,
+            "description": "Significant seasonal variation"
+        },
+        "temperate": {
+            "winter_reduction": 40,
+            "summer_boost": 20,
+            "description": "Strong seasonal variation (deciduous)"
+        },
+        "mediterranean": {
+            "dry_summer_reduction": 30,
+            "wet_winter_boost": 10,
+            "description": "Summer drought stress"
+        }
+    }
+}
