@@ -9,6 +9,8 @@ import soilRoutes from './routes/soil.js';
 import satelliteRoutes from './routes/satellite.js';
 import analyticsRoutes from './routes/analytics.js';
 import siteRoutes from './routes/site.js';
+import enterpriseRoutes from './routes/enterprise.js';
+import realtimeRoutes from './routes/realtime.js';
 
 dotenv.config();
 
@@ -63,6 +65,8 @@ app.use('/api/soil', soilRoutes);
 app.use('/api/satellite', satelliteRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/site', siteRoutes);
+app.use('/api/enterprise', enterpriseRoutes);
+app.use('/api', realtimeRoutes); // Real-time data routes
 
 // Error handling
 app.use((err, req, res, next) => {

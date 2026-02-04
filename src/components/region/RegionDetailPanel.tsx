@@ -10,6 +10,7 @@ import HealthAnalytics from './HealthAnalytics';
 import DecisionSupport from './DecisionSupport';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AnalysisAPI, SiteAnalysisResponse } from '@/services/api/analysisApi';
+import EnterpriseService, { EnterpriseWorkflowResponse } from '@/services/api/enterpriseService';
 import { Progress } from '@/components/ui/progress';
 
 interface RegionDetailPanelProps {
@@ -20,8 +21,10 @@ interface RegionDetailPanelProps {
 
 const RegionDetailPanel = ({ region, onClose, simulationMode }: RegionDetailPanelProps) => {
   const [analysisData, setAnalysisData] = useState<SiteAnalysisResponse | null>(null);
+  const [enterpriseData, setEnterpriseData] = useState<EnterpriseWorkflowResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [useEnterpriseWorkflow, setUseEnterpriseWorkflow] = useState(true); // Toggle for demo
 
   // Fetch detailed analysis when region changes
   useEffect(() => {
@@ -32,17 +35,32 @@ const RegionDetailPanel = ({ region, onClose, simulationMode }: RegionDetailPane
 
   const fetchAnalysisData = async () => {
     if (!region) return;
-    
     setIsLoading(true);
     setError(null);
     
     try {
-      const [lat, lng] = region.coordinates;
-      const analysis = await AnalysisAPI.analyzeSite(lat, lng);
-      setAnalysisData(analysis);
+      if (useEnterpriseWorkflow) {
+        // Use new enterprise workflow
+        const [lat, lng] = region.coordinates;
+        const enterpriseResponse = await EnterpriseService.analyzeRestorationSite({
+          lat,
+          lng,
+          regionName: region.name
+        });
+        setEnterpriseData(enterpriseResponse);
+        
+        // Also get legacy analysis for comparison
+        const legacyAnalysis = await AnalysisAPI.analyzeSite(lat, lng);
+        setAnalysisData(legacyAnalysis);
+      } else {
+        // Use legacy analysis
+        const [lat, lng] = region.coordinates;
+        const analysis = await AnalysisAPI.analyzeSite(lat, lng);
+        setAnalysisData(analysis);
+      }
     } catch (err) {
-      console.error('Failed to fetch analysis data:', err);
       setError(err instanceof Error ? err.message : 'Analysis failed');
+      console.error('Analysis error:', err);
     } finally {
       setIsLoading(false);
     }
