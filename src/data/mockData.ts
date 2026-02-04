@@ -23,11 +23,27 @@ export interface Region {
     phosphorus: 'low' | 'medium' | 'high';
     potassium: 'low' | 'medium' | 'high';
     moisture: number;
+    texture: string;
+    organic_matter: number;
+  };
+  vegetation: {
+    health: number; // 0-100 NDVI equivalent
+    coverage: number; // 0-100 percentage
+    diversity: number; // 0-100 species diversity
+    degradation: 'low' | 'medium' | 'high' | 'severe';
+  };
+  riskZones: {
+    drought: 'low' | 'medium' | 'high';
+    flood: 'low' | 'medium' | 'high';
+    fire: 'low' | 'medium' | 'high';
+    erosion: 'low' | 'medium' | 'high';
   };
   carbonSequestered: number;
   survivalRate: number;
   species: Species[];
   risks: Risk[];
+  restorationPriority: 'low' | 'medium' | 'high' | 'critical';
+  ecosystemType: string;
 }
 
 export interface Species {

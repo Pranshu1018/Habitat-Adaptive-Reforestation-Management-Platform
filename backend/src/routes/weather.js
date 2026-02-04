@@ -10,18 +10,27 @@ const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 // Get current weather
 router.get('/current', async (req, res, next) => {
   try {
-    const { lat, lon } = req.query;
+    const { lat, lon, nocache } = req.query;
     
     if (!lat || !lon) {
       return res.status(400).json({ error: 'Latitude and longitude are required' });
     }
 
     const cacheKey = `weather_${lat}_${lon}`;
-    const cached = cache.get(cacheKey);
     
-    if (cached) {
-      return res.json({ ...cached, cached: true });
+    // Check if cache bypass is requested
+    if (nocache !== 'true') {
+      const cached = cache.get(cacheKey);
+      
+      if (cached) {
+        console.log(`✓ Weather: Returning CACHED data for ${lat}, ${lon} (30min cache)`);
+        return res.json({ ...cached, cached: true, cacheInfo: 'Data from cache (30min TTL)' });
+      }
+    } else {
+      console.log(`🔄 Weather: Cache bypass requested for ${lat}, ${lon}`);
     }
+
+    console.log(`🌐 Weather: Fetching REAL data from OpenWeatherMap for ${lat}, ${lon}...`);
 
     // Access API key from process.env at runtime (not at import time)
     const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
@@ -42,7 +51,7 @@ router.get('/current', async (req, res, next) => {
         timeout: 5000
       });
 
-      console.log('✅ Real weather data fetched successfully');
+      console.log('✅ Real weather data fetched successfully from OpenWeatherMap');
       const weatherData = {
         current: {
           temp: response.data.main.temp,
@@ -55,6 +64,7 @@ router.get('/current', async (req, res, next) => {
           country: response.data.sys.country
         },
         cached: false,
+        cacheInfo: 'Fresh data from OpenWeatherMap API',
         source: 'OpenWeatherMap API'
       };
 
@@ -79,25 +89,34 @@ router.get('/current', async (req, res, next) => {
 // Get forecast
 router.get('/forecast', async (req, res, next) => {
   try {
-    const { lat, lon } = req.query;
+    const { lat, lon, nocache } = req.query;
     
     if (!lat || !lon) {
       return res.status(400).json({ error: 'Latitude and longitude are required' });
     }
 
     const cacheKey = `forecast_${lat}_${lon}`;
-    const cached = cache.get(cacheKey);
     
-    if (cached) {
-      return res.json({ ...cached, cached: true });
+    // Check if cache bypass is requested
+    if (nocache !== 'true') {
+      const cached = cache.get(cacheKey);
+      
+      if (cached) {
+        console.log(`✓ Forecast: Returning CACHED data for ${lat}, ${lon} (30min cache)`);
+        return res.json({ ...cached, cached: true, cacheInfo: 'Data from cache (30min TTL)' });
+      }
+    } else {
+      console.log(`🔄 Forecast: Cache bypass requested for ${lat}, ${lon}`);
     }
+
+    console.log(`🌐 Forecast: Fetching REAL data from OpenWeatherMap for ${lat}, ${lon}...`);
 
     // Access API key from process.env at runtime
     const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 
     if (!OPENWEATHER_API_KEY || OPENWEATHER_API_KEY === 'demo') {
       console.log('⚠️  Using mock forecast data - OpenWeatherMap API key not configured');
-      return res.json({ forecast: getMockForecast() });
+      return res.json({ forecast: getMockForecast(), mock: true });
     }
 
     const response = await axios.get(`${BASE_URL}/forecast`, {
@@ -110,6 +129,7 @@ router.get('/forecast', async (req, res, next) => {
       timeout: 5000
     });
 
+    console.log('✅ Real forecast data fetched successfully from OpenWeatherMap');
     const forecast = response.data.list.slice(0, 28).map(item => ({
       date: item.dt_txt,
       temp: item.main.temp,
@@ -117,7 +137,12 @@ router.get('/forecast', async (req, res, next) => {
       humidity: item.main.humidity,
     }));
 
-    const forecastData = { forecast, timestamp: new Date().toISOString() };
+    const forecastData = { 
+      forecast, 
+      timestamp: new Date().toISOString(),
+      cached: false,
+      cacheInfo: 'Fresh data from OpenWeatherMap API'
+    };
     cache.set(cacheKey, forecastData);
     res.json(forecastData);
   } catch (error) {
@@ -165,5 +190,25 @@ function getMockForecast() {
   
   return forecast;
 }
+
+// Cache management endpoints
+router.get('/cache/stats', (req, res) => {
+  const keys = cache.keys();
+  res.json({
+    totalCached: keys.length,
+    keys: keys,
+    ttl: '30 minutes'
+  });
+});
+
+router.delete('/cache/clear', (req, res) => {
+  const keyCount = cache.keys().length;
+  cache.flushAll();
+  console.log('🗑️  Weather cache cleared');
+  res.json({ 
+    message: 'Weather cache cleared',
+    clearedKeys: keyCount
+  });
+});
 
 export default router;

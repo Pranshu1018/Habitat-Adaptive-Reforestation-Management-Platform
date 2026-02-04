@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { TreeDeciduous, MapPin, ArrowRight } from 'lucide-react';
+import { TreeDeciduous, MapPin, ArrowRight, Leaf, Droplets, AlertTriangle } from 'lucide-react';
 import { Region, countryFlags } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +10,41 @@ interface RegionCardProps {
 }
 
 const RegionCard = ({ region, isSelected, onSelect }: RegionCardProps) => {
+  // Get vegetation health color
+  const getVegetationColor = (score: number) => {
+    if (score >= 75) return 'bg-green-500';
+    if (score >= 50) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  // Get soil quality color
+  const getSoilColor = (quality: string) => {
+    if (quality === 'high' || quality === 'Excellent' || quality === 'Good') return 'bg-green-500';
+    if (quality === 'medium' || quality === 'Fair') return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  // Get risk level color
+  const getRiskColor = (risks: any[]) => {
+    if (!risks || risks.length === 0) return 'bg-green-500';
+    const highRisk = risks.some(r => r.severity === 'critical' || r.severity === 'high');
+    const mediumRisk = risks.some(r => r.severity === 'medium');
+    if (highRisk) return 'bg-red-500';
+    if (mediumRisk) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
+
+  // Calculate vegetation health score
+  const vegetationScore = region.survivalRate || 75;
+  
+  // Get soil quality from region data
+  const soilQuality = region.managementData?.soilQuality?.qualityLevel || 
+                      region.soil?.nitrogen || 'medium';
+  
+  // Get risk level
+  const riskLevel = region.managementData?.riskLevel || 
+                    (region.risks && region.risks.length > 0 ? 'MEDIUM' : 'LOW');
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -37,10 +72,48 @@ const RegionCard = ({ region, isSelected, onSelect }: RegionCardProps) => {
 
       {/* Content */}
       <div className="relative p-5 h-48 flex flex-col justify-between">
-        {/* Top - Country Info */}
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{countryFlags[region.countryCode]}</span>
-          <span className="text-white/90 font-medium text-sm">{region.country}</span>
+        {/* Top - Country Info & Status Indicators */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{countryFlags[region.countryCode]}</span>
+            <span className="text-white/90 font-medium text-sm">{region.country}</span>
+          </div>
+          
+          {/* Status Indicators */}
+          <div className="flex items-center gap-1.5">
+            {/* Vegetation Health */}
+            <div className="group/tooltip relative">
+              <div className={cn(
+                "w-2 h-2 rounded-full",
+                getVegetationColor(vegetationScore)
+              )} />
+              <div className="absolute right-0 top-6 hidden group-hover/tooltip:block z-10 px-2 py-1 bg-black/90 text-white text-xs rounded whitespace-nowrap">
+                Vegetation: {vegetationScore}%
+              </div>
+            </div>
+            
+            {/* Soil Quality */}
+            <div className="group/tooltip relative">
+              <div className={cn(
+                "w-2 h-2 rounded-full",
+                getSoilColor(soilQuality)
+              )} />
+              <div className="absolute right-0 top-6 hidden group-hover/tooltip:block z-10 px-2 py-1 bg-black/90 text-white text-xs rounded whitespace-nowrap">
+                Soil: {typeof soilQuality === 'string' ? soilQuality : 'Medium'}
+              </div>
+            </div>
+            
+            {/* Risk Level */}
+            <div className="group/tooltip relative">
+              <div className={cn(
+                "w-2 h-2 rounded-full",
+                getRiskColor(region.risks)
+              )} />
+              <div className="absolute right-0 top-6 hidden group-hover/tooltip:block z-10 px-2 py-1 bg-black/90 text-white text-xs rounded whitespace-nowrap">
+                Risk: {riskLevel}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Bottom - Region Details */}

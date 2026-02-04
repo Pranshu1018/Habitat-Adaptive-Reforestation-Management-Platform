@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Raw API Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .data-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .data-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .data-section h3 {
+            color: #555;
+            margin: 20px 0 10px 0;
+            font-size: 18px;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            border-left: 4px solid #667eea;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h4 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .summary-card .unit {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .error {
+            background: #fee;
+            border-left: 4px solid #f44;
+            padding: 15px;
+            border-radius: 8px;
+            color: #c33;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #efe;
+            border-left: 4px solid #4f4;
+            padding: 15px;
+            border-radius: 8px;
+            color: #363;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background: #eef;
+            border-left: 4px solid #44f;
+            padding: 15px;
+            border-radius: 8px;
+            color: #336;
+            margin-bottom: 20px;
+        }
+
+        .preset-locations {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .preset-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .preset-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 View Raw API Data</h1>
+            <p class="subtitle">See the actual data being fetched from OpenWeatherMap, SoilGrids, and NASA POWER APIs</p>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <label>Latitude</label>
+                    <input type="number" id="lat" value="28.6139" step="0.0001" placeholder="e.g., 28.6139">
+                </div>
+                <div class="input-wrapper">
+                    <label>Longitude</label>
+                    <input type="number" id="lon" value="77.2090" step="0.0001" placeholder="e.g., 77.2090">
+                </div>
+                <div class="input-wrapper">
+                    <label>API to Fetch</label>
+                    <select id="apiType">
+                        <option value="all">All APIs</option>
+                        <option value="weather">Weather (OpenWeatherMap)</option>
+                        <option value="soil">Soil (SoilGrids)</option>
+                        <option value="climate">Climate (NASA POWER)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="preset-locations">
+                <strong>Quick Locations:</strong>
+                <button class="preset-btn" onclick="setLocation(28.6139, 77.2090, 'Delhi')">Delhi</button>
+                <button class="preset-btn" onclick="setLocation(19.0760, 72.8777, 'Mumbai')">Mumbai</button>
+                <button class="preset-btn" onclick="setLocation(12.9716, 77.5946, 'Bangalore')">Bangalore</button>
+                <button class="preset-btn" onclick="setLocation(13.0827, 80.2707, 'Chennai')">Chennai</button>
+                <button class="preset-btn" onclick="setLocation(22.5726, 88.3639, 'Kolkata')">Kolkata</button>
+            </div>
+
+            <div class="button-group" style="margin-top: 20px;">
+                <button class="btn-primary" onclick="fetchData()">🌐 Fetch Raw Data</button>
+                <button class="btn-secondary" onclick="clearResults()">🗑️ Clear Results</button>
+            </div>
+
+            <div class="info" style="margin-top: 20px;">
+                <strong>💡 Tip:</strong> Check the backend console (where you ran <code>npm run dev</code>) to see the complete raw JSON responses with all fields!
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Fetching data from APIs...</p>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api/debug';
+
+        function setLocation(lat, lon, name) {
+            document.getElementById('lat').value = lat;
+            document.getElementById('lon').value = lon;
+            console.log(`Location set to: ${name} (${lat}, ${lon})`);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function fetchData() {
+            const lat = document.getElementById('lat').value;
+            const lon = document.getElementById('lon').value;
+            const apiType = document.getElementById('apiType').value;
+
+            if (!lat || !lon) {
+                alert('Please enter latitude and longitude');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            loading.style.display = 'block';
+            results.innerHTML = '';
+
+            try {
+                const url = `${API_BASE}/${apiType}/raw?lat=${lat}&lon=${lon}`;
+                console.log('Fetching from:', url);
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                loading.style.display = 'none';
+
+                if (response.ok) {
+                    displayResults(data, apiType);
+                } else {
+                    results.innerHTML = `
+                        <div class="error">
+                            <strong>❌ Error:</strong> ${data.error || 'Failed to fetch data'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                results.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error:</strong> ${error.message}
+                        <br><br>
+                        Make sure the backend is running on port 3001!
+                    </div>
+                `;
+            }
+        }
+
+        function displayResults(data, apiType) {
+            const results = document.getElementById('results');
+            let html = '';
+
+            html += `
+                <div class="success">
+                    <strong>✅ Success!</strong> Data fetched from real APIs. Check the backend console for complete raw JSON responses!
+                </div>
+            `;
+
+            if (apiType === 'weather' || apiType === 'all') {
+                html += displayWeatherData(data);
+            }
+
+            if (apiType === 'soil' || apiType === 'all') {
+                html += displaySoilData(data);
+            }
+
+            if (apiType === 'climate' || apiType === 'all') {
+                html += displayClimateData(data);
+            }
+
+            results.innerHTML = html;
+        }
+
+        function displayWeatherData(data) {
+            if (!data.summary || !data.summary.current) return '';
+
+            const current = data.summary.current;
+            const forecast = data.summary.forecast;
+
+            return `
+                <div class="data-section">
+                    <h2>🌤️ Weather Data (OpenWeatherMap)</h2>
+                    
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Temperature</h4>
+                            <div class="value">${current.temperature}°</div>
+                            <div class="unit">Celsius</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Feels Like</h4>
+                            <div class="value">${current.feelsLike}°</div>
+                            <div class="unit">Celsius</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Humidity</h4>
+                            <div class="value">${current.humidity}%</div>
+                            <div class="unit">Relative</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Pressure</h4>
+                            <div class="value">${current.pressure}</div>
+                            <div class="unit">hPa</div>
+                        </div>
+                    </div>
+
+                    <h3>📍 Location Details</h3>
+                    <pre>${JSON.stringify({
+                        name: current.location,
+                        country: current.country,
+                        coordinates: current.coordinates
+                    }, null, 2)}</pre>
+
+                    <h3>🌡️ Current Weather</h3>
+                    <pre>${JSON.stringify(current, null, 2)}</pre>
+
+                    ${forecast ? `
+                        <h3>📅 Forecast (${forecast.totalEntries} entries)</h3>
+                        <pre>${JSON.stringify(forecast.firstFiveEntries, null, 2)}</pre>
+                        <p style="color: #666; font-style: italic; margin-top: 10px;">
+                            ... and ${forecast.totalEntries - 5} more forecast entries (check backend console for full data)
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function displaySoilData(data) {
+            if (!data.summary || !data.summary.properties) return '';
+
+            const properties = data.summary.properties;
+
+            return `
+                <div class="data-section">
+                    <h2>🌱 Soil Data (SoilGrids)</h2>
+                    
+                    <h3>📊 Soil Properties</h3>
+                    <pre>${JSON.stringify(properties, null, 2)}</pre>
+
+                    <div class="info">
+                        <strong>ℹ️ Note:</strong> Each property is fetched separately from SoilGrids API. 
+                        Check backend console for complete raw responses for each property (phh2o, nitrogen, soc, bdod, clay, sand).
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayClimateData(data) {
+            if (!data.summary || !data.summary.parameters) return '';
+
+            const params = data.summary.parameters;
+
+            return `
+                <div class="data-section">
+                    <h2>🌍 Climate Data (NASA POWER)</h2>
+                    
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Avg Temperature</h4>
+                            <div class="value">${params.temperature.annual.toFixed(1)}°</div>
+                            <div class="unit">Celsius</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Annual Rainfall</h4>
+                            <div class="value">${params.precipitation.annual.toFixed(0)}</div>
+                            <div class="unit">mm/year</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Avg Humidity</h4>
+                            <div class="value">${params.humidity.annual.toFixed(0)}%</div>
+                            <div class="unit">Relative</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Avg Wind Speed</h4>
+                            <div class="value">${params.windSpeed.annual.toFixed(1)}</div>
+                            <div class="unit">m/s</div>
+                        </div>
+                    </div>
+
+                    <h3>🌡️ Monthly Temperature (°C)</h3>
+                    <pre>${JSON.stringify(params.temperature.monthlyData, null, 2)}</pre>
+
+                    <h3>🌧️ Monthly Precipitation (mm/day)</h3>
+                    <pre>${JSON.stringify(params.precipitation.monthlyData, null, 2)}</pre>
+
+                    <h3>💧 Monthly Humidity (%)</h3>
+                    <pre>${JSON.stringify(params.humidity.monthlyData, null, 2)}</pre>
+
+                    <h3>💨 Monthly Wind Speed (m/s)</h3>
+                    <pre>${JSON.stringify(params.windSpeed.monthlyData, null, 2)}</pre>
+
+                    <div class="info">
+                        <strong>ℹ️ Note:</strong> This is climatology data (long-term averages). 
+                        Check backend console for complete raw NASA POWER response with metadata.
+                    </div>
+                </div>
+            `;
+        }
+
+        // Auto-fetch on page load
+        window.addEventListener('load', () => {
+            console.log('Page loaded. Ready to fetch data!');
+            console.log('Backend console will show complete raw JSON responses.');
+        });
+    </script>
+</body>
+</html>

@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, TrendingUp, DollarSign } from 'lucide-react';
-import { globalAnalytics } from '@/data/mockData';
 
-const SocialImpactCard = () => {
+interface GlobalAnalytics {
+  smallholderFarmers: number;
+  averageIncomeIncrease: number;
+  timberValue: number;
+}
+
+interface SocialImpactCardProps {
+  analytics: GlobalAnalytics;
+}
+
+const SocialImpactCard = ({ analytics }: SocialImpactCardProps) => {
   const [displayedFarmers, setDisplayedFarmers] = useState(0);
 
   useEffect(() => {
     const duration = 1500;
     const steps = 60;
-    const increment = globalAnalytics.smallholderFarmers / steps;
+    const increment = analytics.smallholderFarmers / steps;
     let current = 0;
 
     const timer = setInterval(() => {
       current += increment;
-      if (current >= globalAnalytics.smallholderFarmers) {
-        setDisplayedFarmers(globalAnalytics.smallholderFarmers);
+      if (current >= analytics.smallholderFarmers) {
+        setDisplayedFarmers(analytics.smallholderFarmers);
         clearInterval(timer);
       } else {
         setDisplayedFarmers(Math.floor(current));
@@ -23,7 +32,7 @@ const SocialImpactCard = () => {
     }, duration / steps);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [analytics.smallholderFarmers]);
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(num);
@@ -31,9 +40,9 @@ const SocialImpactCard = () => {
 
   const formatCurrency = (num: number) => {
     if (num >= 1000000) {
-      return `$${(num / 1000000).toFixed(1)}M`;
+      return `${(num / 1000000).toFixed(1)}M`;
     }
-    return `$${formatNumber(num)}`;
+    return `${formatNumber(num)}`;
   };
 
   return (
@@ -71,7 +80,7 @@ const SocialImpactCard = () => {
             <span className="text-xs text-muted-foreground">Income Increase</span>
           </div>
           <span className="text-lg font-semibold text-foreground">
-            +{globalAnalytics.averageIncomeIncrease}%
+            +{analytics.averageIncomeIncrease}%
           </span>
         </div>
         <div className="p-3 rounded-xl bg-secondary/50">
@@ -80,7 +89,7 @@ const SocialImpactCard = () => {
             <span className="text-xs text-muted-foreground">Timber Value</span>
           </div>
           <span className="text-lg font-semibold text-foreground">
-            {formatCurrency(globalAnalytics.timberValue)}
+            {formatCurrency(analytics.timberValue)}
           </span>
         </div>
       </div>

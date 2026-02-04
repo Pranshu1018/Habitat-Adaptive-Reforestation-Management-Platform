@@ -9,18 +9,27 @@ const BASE_URL = 'https://rest.isric.org/soilgrids/v2.0';
 
 router.get('/data', async (req, res) => {
   try {
-    const { lat, lon } = req.query;
+    const { lat, lon, nocache } = req.query;
     
     if (!lat || !lon) {
       return res.status(400).json({ error: 'Latitude and longitude are required' });
     }
 
     const cacheKey = `soil_${lat}_${lon}`;
-    const cached = cache.get(cacheKey);
     
-    if (cached) {
-      return res.json({ ...cached, cached: true });
+    // Check if cache bypass is requested
+    if (nocache !== 'true') {
+      const cached = cache.get(cacheKey);
+      
+      if (cached) {
+        console.log(`✓ Soil: Returning CACHED data for ${lat}, ${lon} (24h cache)`);
+        return res.json({ ...cached, cached: true, cacheInfo: 'Data from cache (24h TTL)' });
+      }
+    } else {
+      console.log(`🔄 Soil: Cache bypass requested for ${lat}, ${lon}`);
     }
+
+    console.log(`🌐 Soil: Fetching REAL data from SoilGrids API for ${lat}, ${lon}...`);
 
     try {
       // SoilGrids v2.0 API - correct format
@@ -55,8 +64,9 @@ router.get('/data', async (req, res) => {
       }
 
       const soilData = parseSoilGridsResponses(responses, properties);
+      console.log('✅ Real soil data fetched successfully from SoilGrids');
       cache.set(cacheKey, soilData);
-      res.json(soilData);
+      res.json({ ...soilData, cached: false, cacheInfo: 'Fresh data from SoilGrids API' });
     } catch (error) {
       console.error('SoilGrids API error:', error.message);
       console.log('Using mock soil data due to API error');
@@ -166,5 +176,25 @@ function getMockSoilData(lat, lon) {
     timestamp: new Date().toISOString()
   };
 }
+
+// Cache management endpoints
+router.get('/cache/stats', (req, res) => {
+  const keys = cache.keys();
+  res.json({
+    totalCached: keys.length,
+    keys: keys,
+    ttl: '24 hours'
+  });
+});
+
+router.delete('/cache/clear', (req, res) => {
+  const keyCount = cache.keys().length;
+  cache.flushAll();
+  console.log('🗑️  Soil cache cleared');
+  res.json({ 
+    message: 'Soil cache cleared',
+    clearedKeys: keyCount
+  });
+});
 
 export default router;

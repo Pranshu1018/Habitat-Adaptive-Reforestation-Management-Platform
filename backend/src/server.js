@@ -23,15 +23,12 @@ import siteRoutes from './routes/site.js';
 import enterpriseRoutes from './routes/enterprise.js';
 import realtimeRoutes from './routes/realtime.js';
 import pythonAnalysisRoutes from './routes/python-analysis.js';
+import debugRoutes from './routes/debug.js';
+import managementRoutes from './routes/management.js';
 
 // Log API key status
 console.log('🔑 API Keys Status:');
 console.log('  .env file:', existsSync(envPath) ? '✓ Found' : '✗ Not found');
-console.log('  OpenWeather:', process.env.OPENWEATHER_API_KEY ? '✓ Loaded' : '✗ Missing');
-console.log('  Sentinel Hub:', process.env.SENTINEL_CLIENT_ID ? '✓ Loaded' : '✗ Missing');
-
-// Log API key status (for debugging)
-console.log('🔑 API Keys Status:');
 console.log('  OpenWeather:', process.env.OPENWEATHER_API_KEY ? '✓ Loaded' : '✗ Missing');
 console.log('  Sentinel Hub:', process.env.SENTINEL_CLIENT_ID ? '✓ Loaded' : '✗ Missing');
 
@@ -89,6 +86,8 @@ app.use('/api/site', siteRoutes);
 app.use('/api/enterprise', enterpriseRoutes);
 app.use('/api', realtimeRoutes); // Real-time data routes
 app.use('/api/python-analysis', pythonAnalysisRoutes); // Python analyzer with real APIs
+app.use('/api/debug', debugRoutes); // Debug routes to see raw API data
+app.use('/api/management', managementRoutes); // Management dashboard with risk analysis
 
 // Error handling
 app.use((err, req, res, next) => {

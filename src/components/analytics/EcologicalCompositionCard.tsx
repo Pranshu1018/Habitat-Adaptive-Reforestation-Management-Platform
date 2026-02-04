@@ -1,9 +1,17 @@
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Trees } from 'lucide-react';
-import { globalAnalytics } from '@/data/mockData';
 
-const EcologicalCompositionCard = () => {
+interface GlobalAnalytics {
+  totalHectares: number;
+  ecologicalComposition: Array<{ name: string; value: number }>;
+}
+
+interface EcologicalCompositionCardProps {
+  analytics: GlobalAnalytics;
+}
+
+const EcologicalCompositionCard = ({ analytics }: EcologicalCompositionCardProps) => {
   const COLORS = ['hsl(150, 52%, 33%)', 'hsl(210, 60%, 50%)', 'hsl(25, 40%, 45%)'];
 
   const formatNumber = (num: number) => {
@@ -35,7 +43,7 @@ const EcologicalCompositionCard = () => {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={globalAnalytics.ecologicalComposition}
+                data={analytics.ecologicalComposition}
                 cx="50%"
                 cy="50%"
                 innerRadius={30}
@@ -43,7 +51,7 @@ const EcologicalCompositionCard = () => {
                 paddingAngle={2}
                 dataKey="value"
               >
-                {globalAnalytics.ecologicalComposition.map((_, index) => (
+                {analytics.ecologicalComposition.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -64,7 +72,7 @@ const EcologicalCompositionCard = () => {
 
         {/* Legend */}
         <div className="flex-1 space-y-2">
-          {globalAnalytics.ecologicalComposition.map((item, index) => (
+          {analytics.ecologicalComposition.map((item, index) => (
             <div key={item.name} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div
@@ -83,7 +91,7 @@ const EcologicalCompositionCard = () => {
         <div className="text-sm text-muted-foreground">
           Total Reforested:{' '}
           <span className="font-semibold text-foreground">
-            {formatNumber(globalAnalytics.totalHectares)} ha
+            {formatNumber(analytics.totalHectares)} ha
           </span>
         </div>
       </div>

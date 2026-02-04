@@ -1,9 +1,18 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, Leaf } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { globalAnalytics } from '@/data/mockData';
 
-const CarbonSequestrationCard = () => {
+interface GlobalAnalytics {
+  totalCarbonSequestered: number;
+  carbonGrowthPercent: number;
+  carbonTimelineData: Array<{ year: string; carbon: number }>;
+}
+
+interface CarbonSequestrationCardProps {
+  analytics: GlobalAnalytics;
+}
+
+const CarbonSequestrationCard = ({ analytics }: CarbonSequestrationCardProps) => {
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(num);
   };
@@ -27,20 +36,20 @@ const CarbonSequestrationCard = () => {
         </div>
         <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-success/10 text-success text-sm font-medium">
           <TrendingUp className="w-3 h-3" />
-          <span>+{globalAnalytics.carbonGrowthPercent}%</span>
+          <span>+{analytics.carbonGrowthPercent}%</span>
         </div>
       </div>
 
       <div className="mb-4">
         <span className="text-3xl font-bold text-foreground">
-          {formatNumber(globalAnalytics.totalCarbonSequestered)}
+          {formatNumber(analytics.totalCarbonSequestered)}
         </span>
         <span className="text-muted-foreground text-sm ml-2">t CO₂</span>
       </div>
 
       <div className="h-24">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={globalAnalytics.carbonTimelineData}>
+          <LineChart data={analytics.carbonTimelineData}>
             <XAxis 
               dataKey="year" 
               axisLine={false} 

@@ -99,7 +99,7 @@ export function siteAnalysisToRegion(
 }
 
 /**
- * Hook to enhance existing regions with real data
+ * Hook to enhance existing regions with real data from management API
  */
 export function useEnhancedRegions(regions: Region[], simulationMode: boolean = false) {
   const [enhancedRegions, setEnhancedRegions] = useState<Region[]>(regions);
@@ -112,6 +112,83 @@ export function useEnhancedRegions(regions: Region[], simulationMode: boolean = 
         const enhanced = await Promise.all(
           regions.slice(0, 3).map(async (region) => {
             try {
+              // Fetch from management API for comprehensive risk analysis
+              const managementResponse = await fetch(
+                `http://localhost:3001/api/management/dashboard?lat=${region.coordinates[1]}&lon=${region.coordinates[0]}`
+              );
+              
+              if (managementResponse.ok) {
+                const managementData = await managementResponse.json();
+                
+                console.log('🎉 MANAGEMENT API DATA LOADED:', {
+                  region: region.name,
+                  overallHealth: managementData.overallHealth,
+                  riskLevel: managementData.riskAssessment.riskLevel,
+                  riskScore: managementData.riskAssessment.finalRiskScore,
+                  vegetationHealth: managementData.vegetationHealth.healthScore,
+                  soilQuality: managementData.soilQuality.score
+                });
+                
+                // Also get site analysis for species recommendations
+                const analysis = await dataIntegrationService.analyzeSite(
+                  region.coordinates[1],
+                  region.coordinates[0],
+                  region.name,
+                  region.hectares,
+                  simulationMode
+                );
+
+                // Merge management data with site analysis
+                return {
+                  ...region,
+                  suitabilityScore: managementData.overallHealth,
+                  climate: {
+                    rainfall: Math.round(managementData.weather.precipitation * 365),
+                    temperature: Math.round(managementData.weather.temperature),
+                    seasonality: 'Variable',
+                  },
+                  soil: {
+                    ph: managementData.soilQuality.ph,
+                    nitrogen: managementData.soilQuality.nitrogen,
+                    phosphorus: 'medium',
+                    potassium: 'medium',
+                    moisture: managementData.soilQuality.moisture,
+                    organicCarbon: managementData.soilQuality.organicCarbon,
+                    bulkDensity: 1.3,
+                    clayContent: 25,
+                    sandContent: 40,
+                  },
+                  carbonSequestered: Math.round(analysis.carbonEstimate.currentStock),
+                  survivalRate: managementData.vegetationHealth.healthScore,
+                  species: analysis.speciesRecommendations.map(spec => ({
+                    id: spec.id,
+                    name: spec.name,
+                    scientificName: spec.scientificName,
+                    survivalProbability: spec.survivalProbability,
+                    reason: spec.reason,
+                    imageUrl: spec.imageUrl,
+                  })),
+                  risks: managementData.alerts.map((alert: any, index: number) => ({
+                    id: alert.id,
+                    type: alert.severity === 'critical' ? 'drought' : 'heat',
+                    probability: managementData.riskAssessment.finalRiskScore,
+                    severity: alert.severity,
+                    expectedDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    description: alert.message,
+                  })),
+                  // Add management-specific data
+                  managementData: {
+                    overallHealth: managementData.overallHealth,
+                    riskLevel: managementData.riskAssessment.riskLevel,
+                    primaryRisk: managementData.riskAssessment.primaryCause,
+                    vegetationHealth: managementData.vegetationHealth,
+                    soilQuality: managementData.soilQuality,
+                    riskZones: managementData.riskZones,
+                  }
+                };
+              }
+
+              // Fallback to regular site analysis if management API fails
               const analysis = await dataIntegrationService.analyzeSite(
                 region.coordinates[1],
                 region.coordinates[0],
@@ -146,7 +223,7 @@ export function useEnhancedRegions(regions: Region[], simulationMode: boolean = 
     };
 
     enhanceRegions();
-  }, [simulationMode]);
+  }, [simulationMode, regions]); // Added regions dependency
 
   return { enhancedRegions, loading };
 }
