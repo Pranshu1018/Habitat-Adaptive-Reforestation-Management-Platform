@@ -60,7 +60,7 @@ export const analyticsAPI = {
 };
 
 export const siteAPI = {
-  analyze: (data: { lat: number; lon: number; name: string; hectares: number }) =>
+  analyze: (data: { lat: number; lng: number; name: string; hectares: number }) =>
     api.post('/site/analyze', data),
 };
 

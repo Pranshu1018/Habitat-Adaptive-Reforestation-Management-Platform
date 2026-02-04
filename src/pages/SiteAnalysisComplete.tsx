@@ -127,10 +127,10 @@ const SiteAnalysisComplete = () => {
       // Step 3: Species Matching
       await simulateStep(3, 'Matching optimal species...');
 
-      // Fetch real data
+      // Fetch real data - use 'lng' parameter as backend expects
       const data = await siteAPI.analyze({
         lat: selectedLocation.lat,
-        lon: selectedLocation.lon,
+        lng: selectedLocation.lon,  // Changed from 'lon' to 'lng'
         name: selectedLocation.name,
         hectares: 1000
       });

@@ -1,6 +1,30 @@
-# Habitat: Adaptive Reforestation Management Platform
+# 🌳 HABITAT: Adaptive Reforestation Management Platform
+
+**Real-time satellite data for data-driven forest restoration decisions**
+
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)]()
+[![APIs](https://img.shields.io/badge/APIs-6%20Integrated-blue)]()
+[![Demo](https://img.shields.io/badge/Demo-Ready-green)]()
 
 An intelligent platform managing the complete reforestation lifecycle from initial planning through decades of adaptive management. The system transforms one-time planting into long-term ecosystem survival by identifying optimal planting sites and species, then continuously monitoring, predicting risks, and adapting care strategies as conditions change.
+
+---
+
+## 🚀 **QUICK START (2 COMMANDS)**
+
+```bash
+kill-node.bat
+start.bat
+```
+
+**Browser opens automatically at**: http://localhost:8083/
+
+### **📖 First Time? Read These:**
+- **🚀_START_HERE_FIRST.md** - Quick start guide (2 minutes)
+- **DEMO_CHECKLIST.md** - Step-by-step demo guide
+- **READY_TO_DEMO.md** - Complete demo script
+
+---
 
 ## 🌳 Features
 

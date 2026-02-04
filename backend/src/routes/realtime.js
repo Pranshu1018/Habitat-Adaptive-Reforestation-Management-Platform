@@ -70,41 +70,52 @@ router.get('/soil/detailed', async (req, res) => {
       return res.status(400).json({ error: 'Latitude and longitude required' });
     }
 
-    // SoilGrids REST API - No API key needed!
-    const properties = ['phh2o', 'nitrogen', 'soc', 'clay', 'sand', 'silt'];
-    const depth = '0-5cm'; // Top soil layer
-    
-    const response = await axios.get(`https://rest.isric.org/soilgrids/v2.0/properties/query`, {
-      params: {
-        lon,
-        lat,
-        property: properties.join(','),
-        depth,
-        value: 'mean'
-      },
-      timeout: 10000
-    });
+    // SoilGrids REST API v2.0 - No API key needed!
+    // Try the properties endpoint first
+    try {
+      const response = await axios.get(`https://rest.isric.org/soilgrids/v2.0/properties/query`, {
+        params: {
+          lon: parseFloat(lon),
+          lat: parseFloat(lat),
+          property: 'phh2o,nitrogen,soc,clay,sand,silt',
+          depth: '0-5cm',
+          value: 'mean'
+        },
+        timeout: 15000,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
 
-    const layers = response.data.properties.layers;
-    
-    res.json({
-      location: { lat: parseFloat(lat), lon: parseFloat(lon) },
-      ph: extractSoilValue(layers, 'phh2o') / 10, // Convert to pH scale
-      nitrogen: extractSoilValue(layers, 'nitrogen'),
-      organicCarbon: extractSoilValue(layers, 'soc') / 10,
-      clay: extractSoilValue(layers, 'clay'),
-      sand: extractSoilValue(layers, 'sand'),
-      silt: extractSoilValue(layers, 'silt'),
-      texture: determineSoilTexture(
-        extractSoilValue(layers, 'clay'),
-        extractSoilValue(layers, 'sand'),
-        extractSoilValue(layers, 'silt')
-      ),
-      source: 'SoilGrids',
-      cached: false
-    });
+      const layers = response.data.properties.layers;
+      
+      res.json({
+        location: { lat: parseFloat(lat), lon: parseFloat(lon) },
+        ph: extractSoilValue(layers, 'phh2o') / 10, // Convert to pH scale
+        nitrogen: extractSoilValue(layers, 'nitrogen'),
+        organicCarbon: extractSoilValue(layers, 'soc') / 10,
+        clay: extractSoilValue(layers, 'clay'),
+        sand: extractSoilValue(layers, 'sand'),
+        silt: extractSoilValue(layers, 'silt'),
+        texture: determineSoilTexture(
+          extractSoilValue(layers, 'clay'),
+          extractSoilValue(layers, 'sand'),
+          extractSoilValue(layers, 'silt')
+        ),
+        source: 'SoilGrids',
+        cached: false
+      });
+    } catch (apiError) {
+      console.error('SoilGrids API error:', apiError.message);
+      
+      // Return fallback data with note
+      res.json({
+        ...getFallbackSoilData(lat, lon),
+        note: 'Using fallback data - SoilGrids API temporarily unavailable'
+      });
+    }
   } catch (error) {
-    console.error('SoilGrids API error:', error.message);
+    console.error('Soil data error:', error.message);
     res.status(500).json({ 
       error: 'Failed to fetch soil data',
       fallback: getFallbackSoilData(req.query.lat, req.query.lon)
