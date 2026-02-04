@@ -28,6 +28,17 @@ export interface Project {
   createdAt: any;
   updatedAt: any;
   userId?: string;
+  baseline?: {
+    ndvi: number;
+    soilMoisture: number;
+    temperature: number;
+    date: string;
+  };
+  area?: number;
+  landScore?: number;
+  priority?: string;
+  species?: any[];
+  plantingDate?: string;
 }
 
 export interface SiteAnalysis {
@@ -183,6 +194,24 @@ export const projectService = {
     await update(projectRef, {
       ...updates,
       updatedAt: serverTimestamp()
+    });
+  },
+
+  // Save planting record (used by PlantingDashboard)
+  async savePlantingRecord(projectId: string, plantingData: any): Promise<void> {
+    // Save to plantingRecords collection
+    const plantingsRef = ref(db, 'plantingRecords');
+    const newPlantingRef = push(plantingsRef);
+    
+    await set(newPlantingRef, {
+      ...plantingData,
+      createdAt: serverTimestamp()
+    });
+
+    // Update project status to 'monitoring' (planted projects go to monitoring)
+    await this.updateProject(projectId, {
+      status: 'monitoring',
+      plantingDate: plantingData.plantingDate
     });
   }
 };

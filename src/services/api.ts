@@ -62,6 +62,9 @@ export const analyticsAPI = {
 export const siteAPI = {
   analyze: (data: { lat: number; lng: number; name: string; hectares: number }) =>
     api.post('/site/analyze', data),
+  
+  analyzeCompleteSite: (data: { lat: number; lng: number; name: string; hectares: number }) =>
+    api.post('/site/analyze', data),
 };
 
 export default api;

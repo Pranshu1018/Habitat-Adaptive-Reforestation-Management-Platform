@@ -1,18 +1,14 @@
 @echo off
-echo.
-echo ========================================
 echo Killing all Node.js processes...
-echo ========================================
-echo.
 taskkill /F /IM node.exe 2>nul
 if %errorlevel% equ 0 (
-    echo [OK] All Node.js processes stopped.
+    echo Node.js processes killed successfully!
 ) else (
-    echo [INFO] No Node.js processes were running.
+    echo No Node.js processes found.
 )
 echo.
-echo Port 3001 is now free!
-echo.
-echo You can now run: start.bat
+echo You can now restart the backend with:
+echo   cd backend
+echo   npm run dev
 echo.
 pause

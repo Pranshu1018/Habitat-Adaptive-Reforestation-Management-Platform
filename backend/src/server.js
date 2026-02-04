@@ -1,9 +1,20 @@
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
+
+// Load .env FIRST before any other imports
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envPath = path.join(__dirname, '../.env');
+dotenv.config({ path: envPath });
+
+// Now import everything else
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import weatherRoutes from './routes/weather.js';
 import soilRoutes from './routes/soil.js';
 import satelliteRoutes from './routes/satellite.js';
@@ -11,8 +22,18 @@ import analyticsRoutes from './routes/analytics.js';
 import siteRoutes from './routes/site.js';
 import enterpriseRoutes from './routes/enterprise.js';
 import realtimeRoutes from './routes/realtime.js';
+import pythonAnalysisRoutes from './routes/python-analysis.js';
 
-dotenv.config();
+// Log API key status
+console.log('🔑 API Keys Status:');
+console.log('  .env file:', existsSync(envPath) ? '✓ Found' : '✗ Not found');
+console.log('  OpenWeather:', process.env.OPENWEATHER_API_KEY ? '✓ Loaded' : '✗ Missing');
+console.log('  Sentinel Hub:', process.env.SENTINEL_CLIENT_ID ? '✓ Loaded' : '✗ Missing');
+
+// Log API key status (for debugging)
+console.log('🔑 API Keys Status:');
+console.log('  OpenWeather:', process.env.OPENWEATHER_API_KEY ? '✓ Loaded' : '✗ Missing');
+console.log('  Sentinel Hub:', process.env.SENTINEL_CLIENT_ID ? '✓ Loaded' : '✗ Missing');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -67,6 +88,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/site', siteRoutes);
 app.use('/api/enterprise', enterpriseRoutes);
 app.use('/api', realtimeRoutes); // Real-time data routes
+app.use('/api/python-analysis', pythonAnalysisRoutes); // Python analyzer with real APIs
 
 // Error handling
 app.use((err, req, res, next) => {

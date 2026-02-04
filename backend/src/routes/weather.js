@@ -5,7 +5,6 @@ import NodeCache from 'node-cache';
 const router = express.Router();
 const cache = new NodeCache({ stdTTL: 1800 }); // 30 minutes
 
-const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 // Get current weather
@@ -24,40 +23,56 @@ router.get('/current', async (req, res, next) => {
       return res.json({ ...cached, cached: true });
     }
 
+    // Access API key from process.env at runtime (not at import time)
+    const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
+
     if (!OPENWEATHER_API_KEY || OPENWEATHER_API_KEY === 'demo') {
-      console.log('Using mock weather data - no valid OpenWeatherMap API key provided');
+      console.log('⚠️  Using mock weather data - OpenWeatherMap API key not configured');
       return res.json(getMockWeatherData(parseFloat(lat), parseFloat(lon)));
     }
 
-    const response = await axios.get(`${BASE_URL}/weather`, {
-      params: {
-        lat,
-        lon,
-        appid: OPENWEATHER_API_KEY,
-        units: 'metric'
-      },
-      timeout: 5000
-    });
+    try {
+      const response = await axios.get(`${BASE_URL}/weather`, {
+        params: {
+          lat,
+          lon,
+          appid: OPENWEATHER_API_KEY,
+          units: 'metric'
+        },
+        timeout: 5000
+      });
 
-    const weatherData = {
-      current: {
-        temp: response.data.main.temp,
-        humidity: response.data.main.humidity,
-        precipitation: response.data.rain?.['1h'] || 0,
-        windSpeed: response.data.wind.speed,
-      },
-      location: {
-        name: response.data.name,
-        country: response.data.sys.country
-      },
-      timestamp: new Date().toISOString()
-    };
+      console.log('✅ Real weather data fetched successfully');
+      const weatherData = {
+        current: {
+          temp: response.data.main.temp,
+          humidity: response.data.main.humidity,
+          precipitation: response.data.rain?.['1h'] || 0,
+          windSpeed: response.data.wind.speed,
+        },
+        location: {
+          name: response.data.name,
+          country: response.data.sys.country
+        },
+        cached: false,
+        source: 'OpenWeatherMap API'
+      };
 
-    cache.set(cacheKey, weatherData);
-    res.json(weatherData);
+      cache.set(cacheKey, weatherData);
+      return res.json(weatherData);
+
+    } catch (error) {
+      console.log('❌ OpenWeatherMap API Error:', error.response?.data?.message || error.message);
+      console.log('🔄 Falling back to mock data...');
+      return res.json({
+        ...getMockWeatherData(parseFloat(lat), parseFloat(lon)),
+        apiError: true,
+        errorMessage: error.response?.data?.message || error.message
+      });
+    }
   } catch (error) {
-    console.error('Weather API error:', error.message);
-    res.json(getMockWeatherData(parseFloat(req.query.lat), parseFloat(req.query.lon)));
+    console.error('Weather route error:', error.message);
+    res.json(getMockWeatherData(parseFloat(lat), parseFloat(lon)));
   }
 });
 
@@ -77,8 +92,11 @@ router.get('/forecast', async (req, res, next) => {
       return res.json({ ...cached, cached: true });
     }
 
+    // Access API key from process.env at runtime
+    const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
+
     if (!OPENWEATHER_API_KEY || OPENWEATHER_API_KEY === 'demo') {
-      console.log('Using mock forecast data - no valid OpenWeatherMap API key provided');
+      console.log('⚠️  Using mock forecast data - OpenWeatherMap API key not configured');
       return res.json({ forecast: getMockForecast() });
     }
 
