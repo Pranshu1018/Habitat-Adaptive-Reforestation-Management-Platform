@@ -9,6 +9,7 @@ import PlanningDashboard from "./pages/PlanningDashboard";
 import PlantingDashboard from "./pages/PlantingDashboard";
 import MonitoringDashboard from "./pages/MonitoringDashboard";
 import PredictionDashboard from "./pages/PredictionDashboard";
+import LandHealthAnalytics from "./pages/LandHealthAnalytics";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/planting" element={<PlantingDashboard />} />
           <Route path="/monitoring" element={<MonitoringDashboard />} />
           <Route path="/prediction" element={<PredictionDashboard />} />
+          <Route path="/land-health" element={<LandHealthAnalytics />} />
           <Route path="/dashboard" element={<Index />} />
           <Route path="/management" element={<MonitoringDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
