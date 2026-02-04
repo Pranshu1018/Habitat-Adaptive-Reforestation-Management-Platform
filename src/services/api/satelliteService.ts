@@ -39,10 +39,9 @@ class SatelliteService {
     if (cached) return cached;
 
     try {
-      // In production, this would call Sentinel Hub API
-      // For now, we'll use NASA POWER API for vegetation data approximation
+      // Use our backend API instead of calling external APIs directly
       const response = await fetch(
-        `${API_CONFIG.NASA_POWER.BASE_URL}/daily/point?parameters=ALLSKY_SFC_SW_DWN&community=AG&longitude=${lon}&latitude=${lat}&start=20240101&end=20240131&format=JSON`
+        `http://localhost:3001/api/satellite/vegetation?lat=${lat}&lon=${lon}`
       );
 
       if (!response.ok) {
@@ -50,7 +49,15 @@ class SatelliteService {
       }
 
       const data = await response.json();
-      const vegetationData = this.calculateVegetationMetrics(data, lat, lon);
+      
+      const vegetationData = {
+        ndvi: data.ndvi || 0.5,
+        evi: data.evi || 0.4,
+        coverage: data.coverage || 45,
+        healthScore: data.healthScore || 50,
+        changeRate: data.changeRate || 0,
+        lastUpdated: data.lastUpdated || new Date().toISOString()
+      };
       
       this.setCache(cacheKey, vegetationData);
       return vegetationData;

@@ -44,8 +44,9 @@ class WeatherService {
     if (cached) return cached;
 
     try {
+      // Use our backend API instead of calling OpenWeatherMap directly
       const response = await fetch(
-        `${API_CONFIG.OPENWEATHER.BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_CONFIG.OPENWEATHER.API_KEY}&units=metric`
+        `http://localhost:3001/api/weather/current?lat=${lat}&lon=${lon}`
       );
       
       if (!response.ok) {
@@ -56,12 +57,12 @@ class WeatherService {
       
       const weatherData: WeatherData = {
         current: {
-          temp: data.main.temp,
-          humidity: data.main.humidity,
-          precipitation: data.rain?.['1h'] || 0,
-          windSpeed: data.wind.speed,
+          temp: data.current.temp,
+          humidity: data.current.humidity,
+          precipitation: data.current.precipitation || 0,
+          windSpeed: data.current.windSpeed || 0,
         },
-        forecast: [], // Will be populated by forecast call
+        forecast: [] // Will be populated by getForecast
       };
 
       this.setCache(cacheKey, weatherData);
@@ -79,8 +80,9 @@ class WeatherService {
     if (cached) return cached;
 
     try {
+      // Use our backend API instead of calling OpenWeatherMap directly
       const response = await fetch(
-        `${API_CONFIG.OPENWEATHER.BASE_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_CONFIG.OPENWEATHER.API_KEY}&units=metric`
+        `http://localhost:3001/api/weather/forecast?lat=${lat}&lon=${lon}`
       );
       
       if (!response.ok) {
@@ -89,12 +91,7 @@ class WeatherService {
 
       const data = await response.json();
       
-      const forecast = data.list.slice(0, 28).map((item: any) => ({
-        date: item.dt_txt,
-        temp: item.main.temp,
-        precipitation: item.rain?.['3h'] || 0,
-        humidity: item.main.humidity,
-      }));
+      const forecast = data.forecast || this.getMockForecast();
 
       this.setCache(cacheKey, forecast);
       return forecast;

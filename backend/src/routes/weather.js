@@ -25,6 +25,7 @@ router.get('/current', async (req, res, next) => {
     }
 
     if (!OPENWEATHER_API_KEY || OPENWEATHER_API_KEY === 'demo') {
+      console.log('Using mock weather data - no valid OpenWeatherMap API key provided');
       return res.json(getMockWeatherData(parseFloat(lat), parseFloat(lon)));
     }
 
@@ -77,6 +78,7 @@ router.get('/forecast', async (req, res, next) => {
     }
 
     if (!OPENWEATHER_API_KEY || OPENWEATHER_API_KEY === 'demo') {
+      console.log('Using mock forecast data - no valid OpenWeatherMap API key provided');
       return res.json({ forecast: getMockForecast() });
     }
 

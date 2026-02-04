@@ -116,10 +116,10 @@ const Landing = () => {
             >
               <Button
                 size="lg"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/site-analysis')}
                 className="group px-8 py-6 text-lg"
               >
-                Explore Platform
+                Analyze Your Site
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
@@ -128,7 +128,7 @@ const Landing = () => {
                 onClick={() => navigate('/dashboard')}
                 className="px-8 py-6 text-lg"
               >
-                View Demo
+                View Global Dashboard
               </Button>
             </motion.div>
 
@@ -291,10 +291,10 @@ const Landing = () => {
             </p>
             <Button
               size="lg"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/site-analysis')}
               className="px-8 py-6 text-lg"
             >
-              Get Started Now
+              Start Site Analysis
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </motion.div>

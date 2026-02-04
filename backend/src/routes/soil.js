@@ -40,7 +40,9 @@ router.get('/data', async (req, res) => {
       res.json(soilData);
     } catch (error) {
       console.error('SoilGrids API error:', error.message);
-      res.json(getMockSoilData(parseFloat(lat), parseFloat(lon)));
+      console.log('Using mock soil data due to API error');
+      const mockData = getMockSoilData(parseFloat(lat), parseFloat(lon));
+      res.json({ ...mockData, mock: true, apiError: true });
     }
   } catch (error) {
     console.error('Soil route error:', error);

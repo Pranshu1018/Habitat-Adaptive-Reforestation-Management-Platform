@@ -34,21 +34,29 @@ class SoilService {
     if (cached) return cached;
 
     try {
-      // SoilGrids API endpoint for soil properties
-      const properties = ['phh2o', 'nitrogen', 'soc', 'bdod', 'clay', 'sand'];
-      const depth = '0-5cm'; // Top soil layer
-      
+      // Use our backend API instead of calling SoilGrids directly
       const response = await fetch(
-        `${API_CONFIG.SOILGRIDS.BASE_URL}/properties/query?lon=${lon}&lat=${lat}&property=${properties.join(',')}&depth=${depth}&value=mean`
+        `http://localhost:3001/api/soil/data?lat=${lat}&lon=${lon}`
       );
 
       if (!response.ok) {
-        throw new Error('SoilGrids API request failed');
+        throw new Error('Soil API request failed');
       }
 
       const data = await response.json();
       
-      const soilData = this.parseSoilGridsData(data);
+      const soilData = {
+        ph: data.ph || 6.5,
+        nitrogen: data.nitrogen || 'medium',
+        phosphorus: data.phosphorus || 'medium',
+        potassium: data.potassium || 'medium',
+        moisture: data.moisture || 60,
+        organicCarbon: data.organicCarbon || 2.0,
+        bulkDensity: data.bulkDensity || 1.3,
+        clayContent: data.clayContent || 25,
+        sandContent: data.sandContent || 40
+      };
+
       this.setCache(cacheKey, soilData);
       return soilData;
     } catch (error) {
